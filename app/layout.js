@@ -1,5 +1,6 @@
 import './globals.css'
 import { Oswald, Inter } from 'next/font/google'
+import HockeyLoader from '@/components/HockeyLoader'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 

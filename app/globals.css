@@ -142,3 +142,105 @@ a { color: inherit; text-decoration: none; }
 .sanction-green { background: #ecfdf5; border-left: 6px solid #10b981; color: #065f46; }
 .sanction-yellow { background: #fffbeb; border-left: 6px solid #f59e0b; color: #92400e; }
 .sanction-red { background: #fef2f2; border-left: 6px solid #ef4444; color: #991b1b; }
+/* Aesthetic DMET Hockey Loading Screen */
+.dmet-loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: radial-gradient(circle at 50% 45%, #0f2557 0%, #050d24 75%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  transition: opacity 0.55s ease, visibility 0.55s ease;
+}
+
+.dmet-loader-overlay.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.dmet-emblem-box {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.dmet-compass-ring {
+  position: absolute;
+  inset: 0;
+  animation: compassSpin 10s linear infinite;
+}
+
+.dmet-sticks-svg {
+  width: 112px;
+  height: 112px;
+  z-index: 2;
+}
+
+.dmet-hockey-ball {
+  animation: ballRoll 1.6s ease-in-out infinite alternate;
+}
+
+.dmet-loader-kicker {
+  color: var(--gold);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.dmet-loader-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.dmet-loader-sub {
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  opacity: 0.72;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+
+.dmet-loader-track {
+  width: 220px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.dmet-loader-fill {
+  height: 100%;
+  width: 45%;
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold), #fff1b8);
+  border-radius: 99px;
+  animation: loaderSweep 1.2s ease-in-out infinite;
+}
+
+@keyframes compassSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes ballRoll {
+  0% { transform: translateX(-18px); }
+  100% { transform: translateX(18px); }
+}
+
+@keyframes loaderSweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(260%); }
+}
