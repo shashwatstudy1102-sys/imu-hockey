@@ -118,3 +118,7 @@ a { color: inherit; text-decoration: none; }
 .gallery-card img { width: 100%; height: 250px; object-fit: cover; display: block; transition: transform 0.3s; }
 .gallery-card:hover img { transform: scale(1.04); }
 .gallery-caption { padding: 14px 16px; background: var(--navy); color: var(--white); font-size: 0.92rem; }
+/* Batch Group Headings on Team Page */
+.batch-section { margin-top: 44px; }
+.batch-heading { font-size: 1.7rem; text-transform: uppercase; color: var(--navy); border-left: 5px solid var(--gold); padding-left: 14px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+.batch-count { background: var(--navy); color: var(--gold); font-size: 0.78rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
