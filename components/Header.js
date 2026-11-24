@@ -30,6 +30,7 @@ export default async function Header() {
           <Link href="/awards">Awards</Link>
           <Link href="/gallery">Gallery</Link>
           <Link href="/about-hockey">The Game</Link>
+          <Link href="/contact">Contact</Link>
           {user ? (
             <>
               <Link href="/admin">Dashboard</Link>

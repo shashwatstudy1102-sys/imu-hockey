@@ -12,6 +12,8 @@ export default function AdminDashboard() {
   const [awards, setAwards] = useState([])
   const [matches, setMatches] = useState([])
   const [gallery, setGallery] = useState([])
+  const [enquiries, setEnquiries] = useState([])
+  const [replyDrafts, setReplyDrafts] = useState({})
 
   const emptyPlayer = {
     id: null,
@@ -49,16 +51,18 @@ export default function AdminDashboard() {
   const [file, setFile] = useState(null)
 
   const loadAll = useCallback(async () => {
-    const [p, a, m, g] = await Promise.all([
+    const [p, a, m, g, enq] = await Promise.all([
       supabase.from('players').select('*').order('jersey_number', { ascending: true }),
       supabase.from('awards').select('*').order('year', { ascending: false }),
       supabase.from('matches').select('*').order('match_date', { ascending: false }),
       supabase.from('gallery').select('*').order('created_at', { ascending: false }),
+      supabase.from('enquiries').select('*, enquiry_replies(*)').order('created_at', { ascending: false }),
     ])
     if (p.data) setPlayers(p.data)
     if (a.data) setAwards(a.data)
     if (m.data) setMatches(m.data)
     if (g.data) setGallery(g.data)
+    if (enq.data) setEnquiries(enq.data)
   }, [supabase])
 
   useEffect(() => {
@@ -178,6 +182,32 @@ export default function AdminDashboard() {
     setSaving(false)
   }
 
+  async function saveEnquiryReply(enquiryId) {
+    const text = (replyDrafts[enquiryId] || '').trim()
+    if (!text) return
+    setSaving(true)
+    setStatus('')
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      const { error } = await supabase.from('enquiry_replies').insert([
+        {
+          enquiry_id: enquiryId,
+          admin_id: user?.id ?? null,
+          admin_name: user?.email || 'Team Admin',
+          reply_text: text,
+        },
+      ])
+      if (error) throw error
+      await supabase.from('enquiries').update({ status: 'answered' }).eq('id', enquiryId)
+      setReplyDrafts((prev) => ({ ...prev, [enquiryId]: '' }))
+      setStatus('Reply posted!')
+      loadAll()
+    } catch (err) {
+      setStatus(err.message)
+    }
+    setSaving(false)
+  }
+
   async function handleDelete(table, id) {
     if (!confirm('Are you sure you want to delete this entry?')) return
     const { error } = await supabase.from(table).delete().eq('id', id)
@@ -197,7 +227,7 @@ export default function AdminDashboard() {
   return (
     <div>
       <div className="admin-tabs">
-        {['players', 'awards', 'matches', 'gallery'].map((t) => (
+        {['players', 'awards', 'matches', 'gallery', 'enquiries'].map((t) => (
           <button
             key={t}
             type="button"
@@ -592,6 +622,64 @@ export default function AdminDashboard() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {tab === 'enquiries' && (
+        <div className="admin-list">
+          {status && <p className="admin-msg" style={{ color: 'var(--navy)', background: '#fff4d6' }}>{status}</p>}
+          {enquiries.length === 0 && <p>No enquiries submitted yet.</p>}
+          {enquiries.map((enq) => (
+            <div key={enq.id} className="admin-item" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' }}>
+                <div>
+                  <h4>
+                    {enq.sender_name}
+                    <span className="admin-badge">
+                      {(enq.enquiry_replies && enq.enquiry_replies.length > 0) || enq.status === 'answered' ? 'Answered' : 'Open'}
+                    </span>
+                  </h4>
+                  <p>
+                    {enq.subject || 'General Enquiry'} • {new Date(enq.created_at).toLocaleString()}
+                    {enq.sender_email ? ` • ${enq.sender_email}` : ''}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="btn-sm btn-del"
+                  onClick={() => handleDelete('enquiries', enq.id)}
+                >
+                  Delete
+                </button>
+              </div>
+              <p style={{ marginTop: 8, color: 'var(--text)', whiteSpace: 'pre-wrap' }}>{enq.message}</p>
+              {enq.enquiry_replies && enq.enquiry_replies.length > 0 && (
+                <div style={{ marginTop: 10, paddingLeft: 12, borderLeft: '3px solid var(--gold)', display: 'grid', gap: 6 }}>
+                  {enq.enquiry_replies.map((r) => (
+                    <div key={r.id} style={{ fontSize: '0.9rem' }}>
+                      <strong>{r.admin_name}:</strong> {r.reply_text}
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                <input
+                  style={{ flex: 1, padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(11,31,75,0.2)' }}
+                  placeholder="Write an admin reply..."
+                  value={replyDrafts[enq.id] || ''}
+                  onChange={(e) => setReplyDrafts((prev) => ({ ...prev, [enq.id]: e.target.value }))}
+                />
+                <button
+                  type="button"
+                  className="btn-sm btn-edit"
+                  disabled={saving || !(replyDrafts[enq.id] || '').trim()}
+                  onClick={() => saveEnquiryReply(enq.id)}
+                >
+                  Reply
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

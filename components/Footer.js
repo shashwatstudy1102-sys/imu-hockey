@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function Footer() {
   return (
     <footer className="site-footer">
@@ -6,6 +8,11 @@ export default function Footer() {
           Indian Maritime University, Kolkata Campus Hockey Team
         </p>
         <p>Erstwhile DMET &bull; Erstwhile MERI</p>
+        <p style={{ marginTop: 10 }}>
+          <Link href="/contact" style={{ color: 'var(--gold)', fontWeight: 700, textDecoration: 'underline' }}>
+            Contact &amp; Enquiry Desk
+          </Link>
+        </p>
         <p className="footer-small">
           &copy; {new Date().getFullYear()} IMU Kolkata Campus Hockey Team. All rights reserved.
         </p>
